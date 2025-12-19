@@ -1,11 +1,13 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const BookingSchema = new mongoose.Schema({
-  userId: String,
-  serviceId: String,
-  date: String,
-  time: String,
-  status: { type: String, default: 'Confirmed' }
-});
+const bookingSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: String,
+    date: String,
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Booking', BookingSchema);
+export default mongoose.model("Booking", bookingSchema);
+
