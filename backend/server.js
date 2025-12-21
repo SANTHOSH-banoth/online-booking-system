@@ -3,6 +3,8 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import "./cron/reminderJob.js";
+import authRoutes from "./routes/authRoutes.js";
+
 
 
 import bookingRoutes from "./routes/bookingRoutes.js";
@@ -17,6 +19,8 @@ app.use(express.json());  // Parse JSON request bodies
 
 // ===== Routes =====
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/auth", authRoutes);
+
 
 // ===== Health check route =====
 app.get("/", (req, res) => {
