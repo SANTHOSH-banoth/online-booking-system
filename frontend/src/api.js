@@ -7,7 +7,7 @@ const API = axios.create({
   }
 });
 
-// Automatically attach JWT token to every request
+// Attach token to every request
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -19,12 +19,11 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Optional: handle global API errors (401, 403)
+// Handle unauthorized responses
 API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       window.location.href = "/login";
@@ -34,4 +33,5 @@ API.interceptors.response.use(
 );
 
 export default API;
+
 

@@ -1,13 +1,19 @@
 import mongoose from "mongoose";
 
-const bookingSchema = new mongoose.Schema(
-  {
-    name: String,
-    email: String,
-    date: String,
-  },
-  { timestamps: true }
-);
+// Mongoose schema for bookings
+const bookingSchema = new mongoose.Schema({
+  reminderSent: {
+  type: Boolean,
+  default: false,
+},
 
-export default mongoose.model("Booking", bookingSchema);
+  service: { type: String, required: true },
+  date: { type: Date, required: true },
+  timeSlot: { type: String, required: true },
+  notes: { type: String },
+}, { timestamps: true });
 
+
+const Booking = mongoose.model("Booking", bookingSchema);
+
+export default Booking;

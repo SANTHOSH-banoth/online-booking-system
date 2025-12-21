@@ -12,5 +12,7 @@ router.post('/', async (req, res) => {
   const service = await Service.create(req.body);
   res.json(service);
 });
+router.post("/", authMiddleware, adminMiddleware, addService);
+
 
 module.exports = router;
