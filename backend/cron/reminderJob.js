@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import Booking from "../models/Booking.js";
-import { sendEmail } from "../utils/sendEmail.js";
+import sendEmail from "../utils/sendEmail.js";
+
 
 cron.schedule("*/5 * * * *", async () => {
   console.log("⏰ Checking for upcoming bookings...");

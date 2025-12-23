@@ -8,11 +8,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, html) => {
   await transporter.sendMail({
-    from: `"Online Booking System" <${process.env.EMAIL_USER}>`,
+    from: `"Booking System" <${process.env.EMAIL_USER}>`,
     to,
     subject,
-    text,
+    html,
   });
 };
+
+export default sendEmail;
+
