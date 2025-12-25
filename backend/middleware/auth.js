@@ -1,38 +1,46 @@
 import jwt from "jsonwebtoken";
 
 /**
- * AUTH MIDDLEWARE
+ * 🔐 AUTH MIDDLEWARE
+ * Verifies JWT and attaches user info to request
  */
 export const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Access denied. No token provided." });
-  }
-
-  const token = authHeader.split(" ")[1];
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const authHeader = req.headers.authorization;
 
-    // decoded must contain id and role
-    if (!decoded?.id) {
-      return res.status(401).json({ message: "Invalid token payload" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ message: "Authentication required" });
     }
 
-    req.user = decoded;
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Attach minimal user info (secure)
+    req.user = {
+      id: decoded.id,
+      role: decoded.role,
+    };
+
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Token is invalid or expired" });
+    return res
+      .status(401)
+      .json({ message: "Invalid or expired token" });
   }
 };
 
 /**
- * ADMIN ONLY MIDDLEWARE
+ * 🛡️ ADMIN MIDDLEWARE
+ * Allows access only to admin users
  */
 export const adminMiddleware = (req, res, next) => {
-  if (req.user?.role !== "admin") {
-    return res.status(403).json({ message: "Admin access only" });
+  if (req.user.role !== "admin") {
+    return res
+      .status(403)
+      .json({ message: "Admin access only" });
   }
   next();
 };

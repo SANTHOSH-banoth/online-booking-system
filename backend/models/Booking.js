@@ -1,19 +1,31 @@
 import mongoose from "mongoose";
 
-// Mongoose schema for bookings
-const bookingSchema = new mongoose.Schema({
-  reminderSent: {
-  type: Boolean,
-  default: false,
-},
+const bookingSchema = new mongoose.Schema(
+  {
+    service: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: String, // YYYY-MM-DD
+      required: true,
+    },
+    timeSlot: {
+      type: String, // e.g. "10:00 - 11:00"
+      required: true,
+    },
+    notes: {
+      type: String,
+    },
+    status: {
+      type: String,
+      default: "pending",
+    },
+  },
+  { timestamps: true }
+);
 
-  service: { type: String, required: true },
-  date: { type: Date, required: true },
-  timeSlot: { type: String, required: true },
-  notes: { type: String },
-}, { timestamps: true });
+// 🔥 prevent double booking
+bookingSchema.index({ date: 1, timeSlot: 1 }, { unique: true });
 
-
-const Booking = mongoose.model("Booking", bookingSchema);
-
-export default Booking;
+export default mongoose.model("Booking", bookingSchema);
