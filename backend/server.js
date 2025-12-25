@@ -4,9 +4,6 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import "./cron/reminderJob.js";
 import authRoutes from "./routes/authRoutes.js";
-
-
-
 import bookingRoutes from "./routes/bookingRoutes.js";
 
 dotenv.config();
@@ -29,6 +26,7 @@ app.get("/", (req, res) => {
 
 // ===== Start server =====
 const PORT = process.env.PORT || 5000;
+
 
 mongoose
   .connect(process.env.MONGO_URI)
