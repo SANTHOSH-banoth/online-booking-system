@@ -8,17 +8,22 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
+      index: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email address"],
     },
+
     password: {
       type: String,
       required: true,
-      select: false, // 🔐 hidden by default
+      select: false,
     },
+
     role: {
       type: String,
       enum: ["user", "admin"],
@@ -28,7 +33,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Hash password
+// 🔐 Hash password before save
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
@@ -36,5 +41,6 @@ userSchema.pre("save", async function (next) {
 });
 
 export default mongoose.model("User", userSchema);
+
 
 

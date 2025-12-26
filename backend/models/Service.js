@@ -1,9 +1,25 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const ServiceSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-  duration: Number
-});
+const serviceSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-module.exports = mongoose.model('Service', ServiceSchema);
+    price: {
+      type: Number,
+      required: true,
+    },
+
+    duration: {
+      type: Number, // in minutes
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Service", serviceSchema);
+

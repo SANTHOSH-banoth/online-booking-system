@@ -13,27 +13,23 @@ const ALL_SLOTS = [
   "15:00-16:00",
 ];
 
-// helper → normalize date
+// helper → normalize date to avoid timezone issues
 const normalizeDate = (date) => {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d;
 };
 
-/**
- * ================================
- * CREATE BOOKING (USER)
- * POST /api/bookings
- * ================================
- */
+// ================================
+// CREATE BOOKING (USER)
+// POST /api/bookings
+// ================================
 router.post("/", authMiddleware, async (req, res) => {
   try {
     const { service, date, timeSlot, notes } = req.body;
 
     if (!service || !date || !timeSlot) {
-      return res.status(400).json({
-        message: "Service, date and time slot are required",
-      });
+      return res.status(400).json({ message: "Service, date and time slot are required" });
     }
 
     const bookingDate = normalizeDate(date);
@@ -46,9 +42,7 @@ router.post("/", authMiddleware, async (req, res) => {
     });
 
     if (conflict) {
-      return res
-        .status(409)
-        .json({ message: "This time slot is already booked" });
+      return res.status(409).json({ message: "This time slot is already booked" });
     }
 
     const booking = await Booking.create({
@@ -77,18 +71,14 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * ================================
- * GET AVAILABLE SLOTS (USER)
- * GET /api/bookings/available-slots?date=YYYY-MM-DD
- * ================================
- */
+// ================================
+// GET AVAILABLE SLOTS (USER)
+// GET /api/bookings/available-slots?date=YYYY-MM-DD
+// ================================
 router.get("/available-slots", authMiddleware, async (req, res) => {
   try {
     const { date } = req.query;
-    if (!date) {
-      return res.status(400).json({ message: "Date is required" });
-    }
+    if (!date) return res.status(400).json({ message: "Date is required" });
 
     const bookingDate = normalizeDate(date);
 
@@ -98,9 +88,7 @@ router.get("/available-slots", authMiddleware, async (req, res) => {
     });
 
     const bookedSlots = bookings.map((b) => b.timeSlot);
-    const availableSlots = ALL_SLOTS.filter(
-      (slot) => !bookedSlots.includes(slot)
-    );
+    const availableSlots = ALL_SLOTS.filter((slot) => !bookedSlots.includes(slot));
 
     res.json(availableSlots);
   } catch (error) {
@@ -108,12 +96,10 @@ router.get("/available-slots", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * ================================
- * GET LOGGED-IN USER BOOKINGS
- * GET /api/bookings/my
- * ================================
- */
+// ================================
+// GET LOGGED-IN USER BOOKINGS
+// GET /api/bookings/my
+// ================================
 router.get("/my", authMiddleware, async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user.id })
@@ -126,12 +112,10 @@ router.get("/my", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * ================================
- * RESCHEDULE BOOKING (USER)
- * PUT /api/bookings/:id
- * ================================
- */
+// ================================
+// RESCHEDULE BOOKING (USER)
+// PUT /api/bookings/:id
+// ================================
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const { date, timeSlot } = req.body;
@@ -144,11 +128,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
       status: { $ne: "cancelled" },
     });
 
-    if (conflict) {
-      return res
-        .status(409)
-        .json({ message: "Selected time slot is already booked" });
-    }
+    if (conflict) return res.status(409).json({ message: "Selected time slot is already booked" });
 
     const booking = await Booking.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
@@ -156,9 +136,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
       { new: true }
     );
 
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
 
     await sendEmail(
       req.user.email,
@@ -176,12 +154,10 @@ router.put("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * ================================
- * CANCEL BOOKING (USER)
- * PUT /api/bookings/:id/cancel
- * ================================
- */
+// ================================
+// CANCEL BOOKING (USER)
+// PUT /api/bookings/:id/cancel
+// ================================
 router.put("/:id/cancel", authMiddleware, async (req, res) => {
   try {
     const booking = await Booking.findOneAndUpdate(
@@ -190,9 +166,7 @@ router.put("/:id/cancel", authMiddleware, async (req, res) => {
       { new: true }
     );
 
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
 
     await sendEmail(
       req.user.email,
@@ -206,12 +180,10 @@ router.put("/:id/cancel", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * ================================
- * GET ALL BOOKINGS (ADMIN)
- * GET /api/bookings
- * ================================
- */
+// ================================
+// GET ALL BOOKINGS (ADMIN)
+// GET /api/bookings
+// ================================
 router.get("/", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const bookings = await Booking.find()
@@ -225,16 +197,13 @@ router.get("/", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-/**
- * ================================
- * UPDATE BOOKING STATUS (ADMIN)
- * PUT /api/bookings/:id/status
- * ================================
- */
+// ================================
+// UPDATE BOOKING STATUS (ADMIN)
+// PUT /api/bookings/:id/status
+// ================================
 router.put("/:id/status", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { status } = req.body;
-
     if (!["approved", "rejected", "cancelled"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
@@ -247,9 +216,7 @@ router.put("/:id/status", authMiddleware, adminMiddleware, async (req, res) => {
       .populate("user", "name email")
       .populate("service", "name price");
 
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
 
     await sendEmail(
       booking.user.email,
@@ -268,3 +235,4 @@ router.put("/:id/status", authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 export default router;
+
