@@ -2,10 +2,10 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL:
-    process.env.REACT_APP_API_URL ??
+    process.env.REACT_APP_API_URL ||
     (window.location.hostname === "localhost"
       ? "http://localhost:5000/api"
-      : "https://YOUR-BACKEND-RENDER-URL.onrender.com/api"),
+      : "https://online-booking-system-466z.onrender.com/api"),
   headers: {
     "Content-Type": "application/json",
   },
@@ -35,3 +35,4 @@ API.interceptors.response.use(
 );
 
 export default API;
+
